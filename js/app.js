@@ -15,6 +15,7 @@ success: function(data) {
 function update(svg,nestedYear,i,xScale,yScale,height){
     var rects = svg.selectAll("rect")
                    .data(nestedYear.get(i))
+    console.log(nestedYear.get(i))
     rects.enter()
             .append("rect")
             .merge(rects)
@@ -84,7 +85,7 @@ function draw_histogram(ref, pos_data){
     
     
     let yScale = d3.scaleLinear()
-                   .domain([0,2000])
+                   .domain([0,20000])
                    .range([height, 0]);
 
     // Setup axis
@@ -103,7 +104,7 @@ function draw_histogram(ref, pos_data){
                         .text(Array.from(nestedYear.keys()).at(-1))
     var dropdown_content = d3.select(".dropdown-menu")
                             .selectAll("a")
-                            .data(Array.from(nestedYear.keys()).slice(0,-1)) 
+                            .data(Array.from(nestedYear.keys())) 
                             .enter()
                             .append("a")
                             .attr("class","dropdown-item")

@@ -12,22 +12,48 @@ success: function(data) {
 }
 });
 
+function rescale(svg,yAxis){
+    svg.select(".yaxis")
+    .transition().duration(1500).ease(d3.easeLinear)
+    .call(yAxis);
+}
+
 function update(svg,nestedYear,i,xScale,yScale,height){
     var rects = svg.selectAll("rect")
                    .data(nestedYear.get(i))
-    console.log(nestedYear.get(i))
+    let temp  = 0;
+    let data  = nestedYear.get(i);
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].value> temp){
+            temp = parseInt(data[i].value)
+        }
+    }
+
+
+    yScale.domain([0,temp])
+          .range([height, 0]);
+    
+    var yAxis = d3.axisLeft(yScale)
+
+    if (i=="2020"){
+        svg.append("g")
+            .attr("class", "yaxis")
+            .call(yAxis)
+    }
+    rescale(svg,yAxis)
+    
     rects.enter()
             .append("rect")
             .merge(rects)
             .transition()
             .duration(1000)
             .attr("x", function(d) {return xScale(d.level_2); })
-            .attr("y", function(d) { return yScale(d.value); })
+            .attr("y", function(d) {return yScale(d.value); })
             .attr("width", xScale.bandwidth())
             .attr("height", function(d) { return height - yScale(d.value); })
             .attr("fill", "#69b3a2")
     rects.exit().remove()
-
+    yAxis.exit().remove()
 }
 
 
@@ -40,8 +66,8 @@ function draw_histogram(ref, pos_data){
     // Set the dimensions of the canvas / graph
     //The drawing code needs to reference a responsive elements dimneions
     var margin = {top: 10, right: 30, bottom: 40, left: 50},
-    width = 1300 - margin.left - margin.right,
-    height = 680 - margin.top - margin.bottom;
+    width = 1080 - margin.left - margin.right,
+    height = 540 - margin.top - margin.bottom;
 
 
     /* Adds the svg canvas */
@@ -82,20 +108,14 @@ function draw_histogram(ref, pos_data){
     let xScale = d3.scaleBand()
                    .domain(Array.from(nestedData.keys()))
                    .range([0, width])
-    
-    
+
     let yScale = d3.scaleLinear()
-                   .domain([0,20000])
-                   .range([height, 0]);
 
     // Setup axis
     let xAxis = svg.append("g")
                    .attr("transform","translate(0,"+height+")")
                    .call(d3.axisBottom(xScale));
                    //.tickFormat(d3.format('.0f')));
-
-    let yAxis = svg.append("g")
-                   .call(d3.axisLeft(yScale));
 
 
     // Set the button texts
